@@ -5,7 +5,17 @@
 ### Todo:
 
 * log in to twitter account
-* scrape timeline
+* scrape timeline (highly illegal, I know...)
 * find any tweet marked with "promoted"
 * save the name / id of the account that promoted that tweet
 * use the twitter API to add this account to the block list
+
+
+### Not Working:
+
+* using a headless browser w/o JavaScript (mechanicalsoup)
+
+```html
+<h1>JavaScript is not available.</h1>
+<p>We’ve detected that JavaScript is disabled in this browser. Please enable JavaScript or switch to a supported browser to continue using twitter.com. You can see a list of supported browsers in our Help Center.</p>
+```
