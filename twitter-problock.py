@@ -26,9 +26,7 @@ password_input.send_keys(secrets.password + Keys.RETURN)
 timeline = WebDriverWait(browser, 20).until(EC.visibility_of_element_located((By.XPATH, "//div[@data-testid='primaryColumn']")))
 print(timeline)
 
-#timeline = browser.find_element_by_id('primaryColumn')
-#promoted_tweet = timeline.find_element_by_xpath("//*[contains(text(), 'Promoted')]")
-#print(promoted_tweet)
+#TODO promoted_tweet = timeline.find_element_by_xpath("//*[contains(text(), 'Promoted')]")
 
 print('!Successful Run')
-#browser.quit()
+browser.quit()
