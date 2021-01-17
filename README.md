@@ -10,7 +10,6 @@
 * save the name / id of the account that promoted that tweet
 * use the twitter API to add this account to the block list
 
-
 ### Not Working:
 
 * using a headless browser w/o JavaScript (mechanicalsoup)
