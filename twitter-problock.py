@@ -61,14 +61,22 @@ def search_promoted(timeline):
     try:
         promoted_tweet = timeline.find_element_by_xpath(".//*[contains(text(), 'Promoted')]")
         print(promoted_tweet.get_attribute('outerHTML'))
+
+        promoter = timeline.find_element_by_xpath("//*[contains(text(), 'Promoted')]//ancestor::div[4]//*[contains(text(), '@')]")
+        promoter_usr = promoter.text
+        print(promoter.get_attribute('outerHTML'))
+
+        print(promoter_usr)
+
         return promoted_tweet
 
     except NoSuchElementException:
         return None
 
 def block_promoter(promoted_tweet):
-    promoter_username = browser.find_element_by_xpath(".//*[contains(text(), '@')]")
-    print(promoter_username.get_attribute('outerHTML'))
+    #promoter_username = promoted_tweet.find_element_by_xpath(".//*[contains(text(), '@')]")
+    # //*[contains(text(), 'Promoted')]//ancestor::div[4]//*[contains(text(), '@')]
+    #print(promoter_username.get_attribute('outerHTML'))
     print('blocked')
 
 def main():
