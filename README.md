@@ -1,6 +1,6 @@
 # twitter-problock (WIP)
 
-## scrape your twitter account for promoted content and block the source account
+## Scrape your twitter account for promoted content and block the source. You Pay - I Block!
 
 ### Todo:
 
