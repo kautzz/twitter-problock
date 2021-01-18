@@ -7,9 +7,9 @@
 * use selenium to log in to twitter account ✓
 * scrape timeline (highly illegal, I know...) ✓
 * find any tweet marked with "promoted" ✓
-* save the name / id of the account that promoted that tweet (✓)
-* clean this up and make it more reliable
+* save the name / id of the account that promoted that tweet ✓
 * use the twitter API to add this account to the block list
+* clean this up and make it more reliable ✓
 
 ### Initial Ideas That Did Not Work:
 
