@@ -1,4 +1,4 @@
-# twitter-problock (WIP)
+# twitter-problock (MVP)
 
 ## Scrape your twitter account for promoted content and block the source. You Pay - I Block!
 

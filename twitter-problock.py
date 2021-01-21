@@ -1,5 +1,5 @@
 """
-twitter-problock (WIP)
+twitter-problock (MVP)
 Scrape your twitter account for promoted content and block the source. You Pay - I Block!
 """
 
@@ -14,7 +14,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 
 # How many promoters should we block today
-block_target = 1
+block_target = 5
 
 browser = webdriver.Firefox()
 # TODO learn about browser settings
