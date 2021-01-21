@@ -2,16 +2,26 @@
 
 ## Scrape your twitter account for promoted content and block the source. You Pay - I Block!
 
+### Note:
+
+* scraping and automating things on twitter are not allowed according to [TOS](https://twitter.com/en/tos)
+* there is a good chance that your account might get banned!
+  * seriously, only use this tool if you're okay with loosing your account!
+
+## I'm not responsible for your account getting banned! You have been warned!!!
+
 ### Todo:
 
-* use selenium to log in to twitter account ✓
+* use selenium to drive a browser ✓
+* log in to twitter account ✓
 * scrape timeline (highly illegal, I know...) ✓
 * find any tweet marked with "promoted" ✓
-* save the name / id of the account that promoted that tweet ✓
-* use the twitter API to add this account to the block list
-* clean this up and make it more reliable ✓
+* block the account that promoted the tweet by clicking more > block @user > confirm
+* clean this up and make it more reliable
 
 ### Initial Ideas That Did Not Work:
+
+* use the twitter API to add promoting accounts to the block list - you have to apply for an API key, even if I get one... other ppl using problock might not be so lucky. API keys could also be revoked...
 
 * using a headless browser w/o JavaScript (mechanicalsoup)
 
