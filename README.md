@@ -41,8 +41,8 @@ Twitter has been ramping up the amount of promoted tweets in my timeline recentl
 
 ![Original Tweet](https://github.com/kautzz/twitter-problock/blob/master/tweet.png?raw=true)
 
-
 This has been fun for a while and oddly comforting whenever I hit that block button buuut automation, b*tch!
+No, I'm not a cheap bastard - I would happily pay for twitter pro without promoted content... if there ever was such a thing. 
 
 
 ### Initial Ideas That Did Not Work:
