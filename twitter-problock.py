@@ -6,15 +6,15 @@ Scrape your twitter account for promoted content and block the source. You Pay -
 import secrets
 import time
 
-# How many promoters should we block today
-block_target = 5
-
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
+
+# How many promoters should we block today
+block_target = 5
 
 browser = webdriver.Firefox()
 # TODO learn about browser settings
@@ -25,10 +25,10 @@ class PageLoaded(object):
     def __call__(self, browser):
         time.sleep(5) # TODO remove this and make the doc.ready work instead
         if browser.execute_script("return document.readyState") == "complete":
-          return True
+            return True
         else:
-          print('[⧖] Waiting For Page To Load')
-          return False
+            print('[⧖] Waiting For Page To Load')
+            return False
 
 
 def login():
