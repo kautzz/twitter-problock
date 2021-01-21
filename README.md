@@ -2,7 +2,7 @@
 
 ## Scrape your twitter account for promoted content and block the source. You Pay - I Block!
 
-### Note:
+### Note, Read This:
 
 * scraping and automating things on twitter are not allowed according to their [TOS](https://twitter.com/en/tos)
 * there is a good chance that your account gets banned!
@@ -39,7 +39,8 @@
 
 Twitter has been ramping up the amount of promoted tweets in my timeline recently. I don't like ads, most of the time they are not relevant, they totally mess up my doom scrolling experience. I hate when people pay money to try to get my attention - I started blocking them, manually.
 
-// todo insert img here
+![Original Tweet](https://github.com/kautzz/twitter-problock/blob/master/tweet.png?raw=true)
+
 
 This has been fun for a while and oddly comforting whenever I hit that block button buuut automation, b*tch!
 
