@@ -35,6 +35,15 @@
 [☑] End Of Program
 ```
 
+### Background:
+
+Twitter has been ramping up the amount of promoted tweets in my timeline recently. I don't like ads, most of the time they are not relevant, they totally mess up my doom scrolling experience. I hate when people pay money to try to get my attention - I started blocking them, manually.
+
+// todo insert img here
+
+This has been fun for a while and oddly comforting whenever I hit that block button buuut automation, b*tch!
+
+
 ### Initial Ideas That Did Not Work:
 
 * use the twitter API to add promoting accounts to the block list - you have to apply for an API key, even if I get one... other ppl using problock might not be so lucky. API keys could also be revoked...
