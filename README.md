@@ -4,17 +4,17 @@
 
 ### Note:
 
-* scraping and automating things on twitter are not allowed according to [TOS](https://twitter.com/en/tos)
-* there is a good chance that your account might get banned!
+* scraping and automating things on twitter are not allowed according to their [TOS](https://twitter.com/en/tos)
+* there is a good chance that your account gets banned!
   * seriously, only use this tool if you're okay with loosing your account!
 
-## I'm not responsible for your account getting banned! You have been warned!!!
+#### I'm not responsible for your account getting shut down! You have been warned!!!
 
-### Todo:
+### Todo / What This Tool Is Doing:
 
 * use selenium to drive a browser ✓
 * log in to twitter account ✓
-* scrape timeline (highly illegal, I know...) ✓
+* scrape timeline ✓
 * find any tweet marked with "promoted" ✓
 * block the account that promoted the tweet by clicking more > block @user > confirm
 * clean this up and make it more reliable
