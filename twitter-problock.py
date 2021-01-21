@@ -14,7 +14,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 
 # How many promoters should we block today
-block_target = 5
+block_target = 1
 
 browser = webdriver.Firefox()
 # TODO learn about browser settings
@@ -49,23 +49,32 @@ def login():
 
     # Wait for Tweets to load and select the timeline
     timeline = WebDriverWait(browser, 10).until(EC.visibility_of_element_located((By.XPATH, "//div[@data-testid='primaryColumn']")))
-    print('-------------------------------')
+    print('===============================')
 
     return timeline
 
 
-def search_promoter(timeline):
+def search_promoted(timeline):
     try:
-        promoter = timeline.find_element(By.XPATH, "//*[contains(text(), 'Promoted')]//ancestor::div[4]//*[contains(text(), '@')]").text
-        return promoter
+        promoted = timeline.find_element(By.XPATH, ".//*[contains(text(), 'Promoted')]//ancestor::div[4]")
+        print('-------------------------------')
+        print('[⚠] Promoted Tweet Found!')
+        return promoted
 
     except NoSuchElementException:
         return None
 
 
-def block_user(promoter):
-    # TODO use twitter API to block promoters
-    print('[⊘] Promoted Tweet Found! Blocking User: ' + promoter)
+def block_user(promoted):
+
+    promoter = promoted.find_element(By.XPATH, ".//*[contains(text(), '@')]")
+    print('[⊘] Blocking User: ' + promoter.get_attribute('innerHTML'))
+
+    time.sleep(1)
+    promoted.find_element(By.XPATH, ".//div[@data-testid='caret']").click()
+    browser.find_element(By.XPATH, "//div[@data-testid='block']").click()
+    browser.find_element(By.XPATH, "//div[@data-testid='confirmationSheetConfirm']").click()
+    print('[✝] R.I.P')
 
 
 def load_more_tweets():
@@ -98,14 +107,15 @@ def main():
 
     while blocked_users < block_target:
 
-        promoter = search_promoter(timeline)
+        promoted = search_promoted(timeline)
 
-        if promoter is not None:
-            block_user(promoter)
+        if promoted is not None:
+            block_user(promoted)
             blocked_users += 1
 
-            print('-------------------------------')
             print('[☭] Blocked ' + str(blocked_users) + '/' + str(block_target) + ' Promoters')
+            print('===============================')
+
 
             timeline = refresh_page()
             lazy_loads = 0
@@ -125,4 +135,4 @@ if __name__ == "__main__":
     main()
 
 print('[☑] End Of Program')
-browser.quit()
+#browser.quit()

@@ -10,14 +10,30 @@
 
 #### I'm not responsible for your account getting shut down! You have been warned!!!
 
-### Todo / What This Tool Is Doing:
+### What This Tool Is Doing:
 
 * use selenium to drive a browser ✓
 * log in to twitter account ✓
 * scrape timeline ✓
 * find any tweet marked with "promoted" ✓
-* block the account that promoted the tweet by clicking more > block @user > confirm
-* clean this up and make it more reliable
+* block the account that promoted the tweet by clicking more > block @user > confirm ✓
+
+### Output Sample:
+
+```
+[☩] Loading Target: XXX
+[⚷] Logged In As User: XXX
+===============================
+[⚲] No Promoted Content Found In Timeline
+[⬇] Scrolling To Lazy Load Tweets
+-------------------------------
+[⚠] Promoted Tweet Found!
+[⊘] Blocking User: @XYZ
+[✝] R.I.P
+[☭] Blocked 1/1 Promoters
+===============================
+[☑] End Of Program
+```
 
 ### Initial Ideas That Did Not Work:
 
