@@ -1,8 +1,10 @@
+# coding=utf-8
+#!/usr/bin/env python3
+
 """
 twitter-problock (MVP)
 Scrape your twitter account for promoted content and block the source. You Pay - I Block!
 """
-#!/usr/bin/env python3
 
 import secrets
 import time
