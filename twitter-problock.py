@@ -91,7 +91,7 @@ def login():
     password_input = browser.find_element(By.NAME, 'session[password]')
     password_input.send_keys(secrets.password + Keys.RETURN)
     #time.sleep(60) # give me some time to enter the second factor
-    print('[⚷] Logged In As User: ' + secrets.username)
+    print('[☑] Logged In As User: ' + secrets.username)
     WebDriverWait(browser, 10).until(PageLoaded())
 
     # Wait for Tweets to load and select the timeline

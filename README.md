@@ -1,13 +1,15 @@
 # twitter-problock
 
-## Scrape your twitter account for promoted content and block the source. You Pay - I Block!
+### Scrape your twitter account for promoted content and block the source.
+
+# You Pay - I Block!
 
 ### Note, Read This:
 
 Scraping and automating things on twitter are not allowed according to their [TOS](https://twitter.com/en/tos).
 There is a good chance that your account gets banned! Seriously, only use this tool if you're okay with loosing your account!
 
-#### I'm not responsible for your account getting shut down! You have been warned!!!
+### I'm not responsible for your account getting shut down! You have been warned!!!
 
 ### Background:
 
@@ -29,7 +31,7 @@ This has been fun for a while and oddly comforting whenever I hit that block but
 
 ```
 [☩] Loading Target: XXX
-[⚷] Logged In As User: XXX
+[☑] Logged In As User: XXX
 ===============================
 [⚲] No Promoted Content Found In Timeline
 [⬇] Scrolling To Lazy Load Tweets
