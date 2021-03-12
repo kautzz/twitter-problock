@@ -58,13 +58,12 @@ def update_browser_window_config():
             config.write(f)
             print('config updated')
 
+
 def play_notification_sound():
     if config.getboolean('main', 'sound_enabled') == True:
         wave_obj = sa.WaveObject.from_wave_file("notification.wav")
         play_obj = wave_obj.play()
         play_obj.wait_done()
-    else:
-        print('audio off')
 
 
 # Helper for waiting until page has loaded
@@ -183,6 +182,7 @@ def main():
             lazy_loads = 0
 
         update_browser_window_config()
+        play_notification_sound()
 
 if __name__ == "__main__":
     main()
