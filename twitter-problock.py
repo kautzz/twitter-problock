@@ -182,7 +182,6 @@ def main():
             lazy_loads = 0
 
         update_browser_window_config()
-        play_notification_sound()
 
 if __name__ == "__main__":
     main()
