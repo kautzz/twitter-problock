@@ -9,7 +9,6 @@ Scrape your twitter account for promoted content and block the source. You Pay -
 import secrets
 import time
 import random
-
 import simpleaudio as sa
 
 from selenium import webdriver
@@ -19,16 +18,45 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 
+from configparser import ConfigParser
+config = ConfigParser()
+config.read('config.ini')
+
 # How many promoters should we block today
-block_target = 100
+block_target = config.getint('main', 'blocks')
 
-# TODO learn about browser settings
+# Set up selenium browser window
 profile = webdriver.FirefoxProfile()
-profile.set_preference("general.useragent.override", "Mozilla/5.0 (iPhone; CPU iPhone OS 14_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Mobile/15E148 Safari/604.1")
+profile.set_preference("general.useragent.override", config.get('main', 'useragent'))
 browser = webdriver.Firefox(profile)
-browser.set_window_position(0, 0)
-browser.set_window_size(960, 1080)
+browser.set_window_position(config.getint('browser_window', 'pos_x'), config.getint('browser_window', 'pos_y'))
+browser.set_window_size(config.getint('browser_window', 'width'), config.getint('browser_window', 'height'))
 
+
+def update_browser_window_config():
+
+    # Saves browser window size and position to the config file when you move the window
+    window_position = browser.get_window_position(windowHandle ='current')
+    window_size = browser.get_window_size(windowHandle ='current')
+    save_changes = False
+
+    if window_position['x'] != config.getint('browser_window', 'pos_x'):
+        config.set('browser_window', 'pos_x', str(window_position['x']))
+        save_changes = True
+    if window_position['y'] != config.getint('browser_window', 'pos_y'):
+        config.set('browser_window', 'pos_y', str(window_position['y']))
+        save_changes = True
+    if window_size['width'] != config.getint('browser_window', 'width'):
+        config.set('browser_window', 'width', str(window_size['width']))
+        save_changes = True
+    if window_size['height'] != config.getint('browser_window', 'height'):
+        config.set('browser_window', 'height', str(window_size['height']))
+        save_changes = True
+
+    if save_changes == True:
+        with open('config.ini', 'w') as f:
+            config.write(f)
+            print('config updated')
 
 
 # Helper for waiting until page has loaded
@@ -61,10 +89,6 @@ def login():
 
     # Wait for Tweets to load and select the timeline
     timeline = WebDriverWait(browser, 10).until(EC.visibility_of_element_located((By.XPATH, "//div[@data-testid='primaryColumn']")))
-
-    wave_obj = sa.WaveObject.from_wave_file("notification.wav")
-    play_obj = wave_obj.play()
-    play_obj.wait_done()
 
     print('===============================')
 
@@ -152,6 +176,7 @@ def main():
             timeline = refresh_page()
             lazy_loads = 0
 
+        update_browser_window_config()
 
 if __name__ == "__main__":
     main()
