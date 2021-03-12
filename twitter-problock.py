@@ -58,6 +58,14 @@ def update_browser_window_config():
             config.write(f)
             print('config updated')
 
+def play_notification_sound():
+    if config.getboolean('main', 'sound_enabled') == True:
+        wave_obj = sa.WaveObject.from_wave_file("notification.wav")
+        play_obj = wave_obj.play()
+        play_obj.wait_done()
+    else:
+        print('audio off')
+
 
 # Helper for waiting until page has loaded
 class PageLoaded(object):
@@ -159,10 +167,8 @@ def main():
 
             print('[☭] Blocked ' + str(blocked_users) + '/' + str(block_target) + ' Promoters')
             print('===============================')
+            play_notification_sound()
 
-            wave_obj = sa.WaveObject.from_wave_file("notification.wav")
-            play_obj = wave_obj.play()
-            play_obj.wait_done()
             timeline = refresh_page()
             lazy_loads = 0
 
