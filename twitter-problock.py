@@ -8,6 +8,7 @@ Scrape your twitter account for promoted content and block the source. You Pay -
 
 import secrets
 import time
+import datetime
 import random
 import simpleaudio as sa
 
@@ -66,15 +67,28 @@ def play_notification_sound():
         play_obj.wait_done()
 
 
-# Helper for waiting until page has loaded
-class PageLoaded(object):
-    def __call__(self, browser):
-        time.sleep(5) # TODO remove this and make the doc.ready work instead
-        if browser.execute_script("return document.readyState") == "complete":
-            return True
-        else:
-            print('[⧖] Waiting For Page To Load')
-            return False
+def wait_for_pageload():
+    print('waiting for pageload')
+    start_time = datetime.datetime.now()
+
+    try:
+        WebDriverWait(browser, 10).until(EC.visibility_of_element_located((By.XPATH, "//div[@role='progressbar']/following::div[contains(@style, '26px')]")))
+    except:
+        print('nothing was loading...')
+        return
+
+    try:
+        WebDriverWait(browser, 10).until(EC.invisibility_of_element_located((By.XPATH, "//div[@role='progressbar']/following::div[contains(@style, '26px')]")))
+    except:
+        print('pageload timed out...')
+        return
+
+    end_time = datetime.datetime.now()
+    time_diff = (end_time - start_time)
+    execution_time = time_diff.total_seconds()
+
+    print('done! waited: ' + str(execution_time) + 's')
+
 
 
 def login():
@@ -82,7 +96,6 @@ def login():
     # Load Target Page
     browser.get(secrets.url)
     print('[☩] Loading Target: ' + secrets.url)
-    WebDriverWait(browser, 10).until(PageLoaded())
     assert secrets.target in browser.title
 
     # Login
@@ -92,10 +105,10 @@ def login():
     password_input.send_keys(secrets.password + Keys.RETURN)
     #time.sleep(60) # give me some time to enter the second factor
     print('[☑] Logged In As User: ' + secrets.username)
-    WebDriverWait(browser, 10).until(PageLoaded())
 
-    # Wait for Tweets to load and select the timeline
-    timeline = WebDriverWait(browser, 10).until(EC.visibility_of_element_located((By.XPATH, "//div[@data-testid='primaryColumn']")))
+    wait_for_pageload()
+    timeline = browser.find_element(By.XPATH, "//div[@data-testid='primaryColumn']")
+
 
     print('===============================')
 
@@ -115,6 +128,7 @@ def search_promoted(timeline):
 
 def block_user(promoted):
 
+    wait_for_pageload()
     promoter = promoted.find_element(By.XPATH, ".//*[contains(text(), '@')]")
     print('[⊘] Blocking User: ' + promoter.get_attribute('innerHTML'))
 
@@ -133,7 +147,7 @@ def load_more_tweets():
     #print('[⬇] Scrolling To Lazy Load Tweets')
     browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
-    WebDriverWait(browser, 10).until(PageLoaded())
+    wait_for_pageload()
     timeline = browser.find_element(By.XPATH, "//div[@data-testid='primaryColumn']")
 
     return timeline
@@ -144,7 +158,8 @@ def refresh_page():
     rand_delay()
     #print('[⟳] Reloading Page')
     browser.refresh()
-    WebDriverWait(browser, 10).until(PageLoaded())
+
+    wait_for_pageload()
     timeline = browser.find_element(By.XPATH, "//div[@data-testid='primaryColumn']")
 
     return timeline
