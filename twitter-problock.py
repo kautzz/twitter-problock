@@ -23,9 +23,6 @@ from configparser import ConfigParser
 config = ConfigParser()
 config.read('config.ini')
 
-# How many promoters should we block today
-block_target = config.getint('main', 'blocks')
-
 # Set up selenium browser window
 profile = webdriver.FirefoxProfile()
 profile.set_preference("general.useragent.override", config.get('main', 'useragent'))
@@ -34,9 +31,9 @@ browser.set_window_position(config.getint('browser_window', 'pos_x'), config.get
 browser.set_window_size(config.getint('browser_window', 'width'), config.getint('browser_window', 'height'))
 
 
+# Saves browser window size and position to the config when you move the window
 def update_browser_window_config():
 
-    # Saves browser window size and position to the config file when you move the window
     window_position = browser.get_window_position(windowHandle ='current')
     window_size = browser.get_window_size(windowHandle ='current')
     save_changes = False
@@ -60,6 +57,7 @@ def update_browser_window_config():
             print('config updated')
 
 
+# Plays a notification sound when a user has been blocked if enabled in config
 def play_notification_sound():
     if config.getboolean('main', 'sound_enabled') == True:
         wave_obj = sa.WaveObject.from_wave_file("notification.wav")
@@ -67,21 +65,22 @@ def play_notification_sound():
         play_obj.wait_done()
 
 
+# Wait until content of the page has loaded completly
 def wait_for_pageload():
     print('waiting for pageload')
     start_time = datetime.datetime.now()
 
     try:
-        WebDriverWait(browser, 10).until(EC.visibility_of_element_located((By.XPATH, "//div[@role='progressbar']/following::div[contains(@style, '26px')]")))
+        WebDriverWait(browser, 3).until(EC.visibility_of_element_located((By.XPATH, "//div[@role='progressbar']/following::div[contains(@style, '26px')]")))
     except:
         print('nothing was loading...')
-        return
+        return 0
 
     try:
-        WebDriverWait(browser, 10).until(EC.invisibility_of_element_located((By.XPATH, "//div[@role='progressbar']/following::div[contains(@style, '26px')]")))
+        WebDriverWait(browser, 5).until(EC.invisibility_of_element_located((By.XPATH, "//div[@role='progressbar']/following::div[contains(@style, '26px')]")))
     except:
         print('pageload timed out...')
-        return
+        return 1
 
     end_time = datetime.datetime.now()
     time_diff = (end_time - start_time)
@@ -90,31 +89,30 @@ def wait_for_pageload():
     print('done! waited: ' + str(execution_time) + 's')
 
 
-
+# Log in to twitter with creds provided in secrets file
 def login():
 
-    # Load Target Page
     browser.get(secrets.url)
     print('[☩] Loading Target: ' + secrets.url)
+    time.sleep(1)
     assert secrets.target in browser.title
 
-    # Login
     username_input = browser.find_element(By.NAME, 'session[username_or_email]')
     username_input.send_keys(secrets.username)
     password_input = browser.find_element(By.NAME, 'session[password]')
     password_input.send_keys(secrets.password + Keys.RETURN)
-    #time.sleep(60) # give me some time to enter the second factor
+
+    #time.sleep(60) # give me some time to manually enter the second factor
     print('[☑] Logged In As User: ' + secrets.username)
 
-    wait_for_pageload()
+    login_result = wait_for_pageload()
     timeline = browser.find_element(By.XPATH, "//div[@data-testid='primaryColumn']")
 
-
     print('===============================')
-
     return timeline
 
 
+# Search for any tweets in the timeline that are tagged with promoted
 def search_promoted(timeline):
     try:
         promoted = timeline.find_element(By.XPATH, ".//*[contains(text(), 'Promoted')]//ancestor::div[4]")
@@ -126,47 +124,56 @@ def search_promoted(timeline):
         return None
 
 
+# Block the user that created the promoted tweet
 def block_user(promoted):
 
-    wait_for_pageload()
     promoter = promoted.find_element(By.XPATH, ".//*[contains(text(), '@')]")
     print('[⊘] Blocking User: ' + promoter.get_attribute('innerHTML'))
 
-    time.sleep(1)
-    promoted.find_element(By.XPATH, ".//div[@data-testid='caret']").click()
-    browser.find_element(By.XPATH, "//div[@data-testid='block']").click()
-    browser.find_element(By.XPATH, "//div[@data-testid='confirmationSheetConfirm']").click()
-    print('[✝] R.I.P')
+    try:
+        promoted.find_element(By.XPATH, ".//div[@data-testid='caret']").click()
+        time.sleep(1)
+        browser.find_element(By.XPATH, "//div[@data-testid='block']").click()
+        time.sleep(1)
+        browser.find_element(By.XPATH, "//div[@data-testid='confirmationSheetConfirm']").click()
+        print('[✝] R.I.P')
+    except:
+        print('blocking failed')
 
-def rand_delay():
-    time.sleep(random.randint(0,4))
 
+# Scroll down to lazy load more tweets
 def load_more_tweets():
 
-    rand_delay()
     #print('[⬇] Scrolling To Lazy Load Tweets')
     browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    load_result = wait_for_pageload()
 
-    wait_for_pageload()
+    if load_result == 0:
+        return
+
     timeline = browser.find_element(By.XPATH, "//div[@data-testid='primaryColumn']")
-
     return timeline
 
 
+# Do a page reload instead of lazy loading to get more tweets
 def refresh_page():
 
-    rand_delay()
     #print('[⟳] Reloading Page')
     browser.refresh()
+    refresh_result = wait_for_pageload()
 
-    wait_for_pageload()
     timeline = browser.find_element(By.XPATH, "//div[@data-testid='primaryColumn']")
-
     return timeline
+
 
 def main():
 
+    # How many promoters should we block today
+    block_target = config.getint('main', 'blocks')
     blocked_users = 0
+
+    # How often should we lazy load before we refesh the page
+    max_lazy_loads = config.getint('main', 'max_lazy_loads')
     lazy_loads = 0
 
     timeline = login()
@@ -186,7 +193,7 @@ def main():
             timeline = refresh_page()
             lazy_loads = 0
 
-        elif lazy_loads < 4:
+        elif lazy_loads <= max_lazy_loads:
             #print('[⚲] No Promoted Content Found In Timeline')
             timeline = load_more_tweets()
             lazy_loads += 1
