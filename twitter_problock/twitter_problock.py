@@ -212,7 +212,7 @@ def main():
 
         update_browser_window_config()
         log.info('****************************************')
-        time.sleep(3) # TODO make this a more random wait to hide that this is an automation
+        time.sleep(1) # TODO make this a more random wait to hide that this is an automation
 
 if __name__ == "__main__":
     main()
