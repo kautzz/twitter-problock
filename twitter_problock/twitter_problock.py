@@ -6,13 +6,15 @@ twitter-problock (MVP)
 Scrape your twitter account for promoted content and block the source. You Pay - I Block!
 """
 
-import argparse
 import secrets
+
 import time
 import datetime
 import simpleaudio as sa
-from configparser import ConfigParser
 import logging as log
+
+import argparse
+from configparser import ConfigParser
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -21,19 +23,19 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 
-parser = argparse.ArgumentParser(
-    description='Scrape your twitter account for promoted content and block the source. You Pay - I Block!'
-)
-parser.add_argument("-v", "--verbose", help="increase output verbosity",
-                    action="store_true")
+
+# Read Config File
+config = ConfigParser()
+config.read('settings.ini')
+
+# Command Line Options
+parser = argparse.ArgumentParser(description='Scrape your twitter account for promoted content and block the source. You Pay - I Block!')
+parser.add_argument("-v", "--verbose", help="increase output verbosity", action="store_true")
 
 args = parser.parse_args()
 if args.verbose:
     log.basicConfig(level=log.INFO, format='%(asctime)s - %(levelname)s: %(message)s')
 
-
-config = ConfigParser()
-config.read('config.ini')
 
 # Set up selenium browser window
 profile = webdriver.FirefoxProfile()
@@ -65,7 +67,7 @@ def update_browser_window_config():
         save_changes = True
 
     if save_changes == True:
-        with open('config.ini', 'w') as f:
+        with open('settings.ini', 'w') as f:
             config.write(f)
             log.info('Browser Window Config Written')
 
@@ -74,7 +76,7 @@ def update_browser_window_config():
 def play_notification_sound():
     log.info('Playing Notification Sound If Enabled')
     if config.getboolean('main', 'sound_enabled') == True:
-        wave_obj = sa.WaveObject.from_wave_file("notification.wav")
+        wave_obj = sa.WaveObject.from_wave_file("src/notification.wav")
         play_obj = wave_obj.play()
         play_obj.wait_done()
 
@@ -87,7 +89,7 @@ def wait_for_pageload():
     try:
         WebDriverWait(browser, 3).until(EC.visibility_of_element_located((By.XPATH, "//div[@role='progressbar']/following::div[contains(@style, '26px')]")))
     except:
-        log.warning('Could Not Trigger Loading New Content!')
+        log.info('Could Not Trigger Loading New Content!')
         return
 
     try:
@@ -148,10 +150,14 @@ def block_user(promoted):
 
     try:
         promoted.find_element(By.XPATH, ".//div[@data-testid='caret']").click()
-        time.sleep(1)
-        browser.find_element(By.XPATH, "//div[@data-testid='block']").click()
-        time.sleep(1)
-        browser.find_element(By.XPATH, "//div[@data-testid='confirmationSheetConfirm']").click()
+        element = WebDriverWait(browser, 5).until(EC.element_to_be_clickable(By.XPATH, "//div[@data-testid='block']"))
+        element.click()
+        #time.sleep(0.1)
+        #browser.find_element(By.XPATH, "//div[@data-testid='block']").click()
+        element = WebDriverWait(browser, 5).until(EC.element_to_be_clickable(By.XPATH, "//div[@data-testid='confirmationSheetConfirm']"))
+        element.click()
+        #time.sleep(1)
+        #browser.find_element(By.XPATH, "//div[@data-testid='confirmationSheetConfirm']").click()
         print('[✝] R.I.P')
     except Exception as e:
         log.error('Could Not Block Promoter: ' + e)
@@ -180,13 +186,12 @@ def refresh_page():
 
 def main():
 
-    block_target = config.getint('main', 'blocks')
     blocked_users = 0
-    i = 0
+    lazy_loads = 0
 
     timeline = login()
 
-    while blocked_users < block_target:
+    while blocked_users < config.getint('main', 'blocks'):
 
         promoted = search_promoted(timeline)
 
@@ -205,14 +210,15 @@ def main():
             load_result = load_more_tweets()
             if load_result is not None:
                 timeline = load_result
-                i += 1
-                log.info('Number Of Lazy Loads Before Pagerefresh: ' + str(i))
+                lazy_loads += 1
+                log.info('Number Of Lazy Loads Before Pagerefresh: ' + str(lazy_loads))
             else:
                 timeline = refresh_page()
-                i = 0
+                lazy_loads = 0
 
         update_browser_window_config()
         log.info('****************************************')
+        time.sleep(3) # TODO make this a more random wait to hide that this is an automation
 
 if __name__ == "__main__":
     main()
