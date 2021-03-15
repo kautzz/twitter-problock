@@ -144,18 +144,17 @@ def search_promoted(timeline):
 def block_user(promoted):
     log.info('Blocking Promoter')
     promoter = promoted.find_element(By.XPATH, ".//*[contains(text(), '@')]")
-    time.sleep(3)
+    print('[⊘] Blocking User: ' + promoter.get_attribute('innerHTML'))
 
     try:
         promoted.find_element(By.XPATH, ".//div[@data-testid='caret']").click()
-        time.sleep(3)
+        time.sleep(1)
         browser.find_element(By.XPATH, "//div[@data-testid='block']").click()
-        time.sleep(3)
+        time.sleep(1)
         browser.find_element(By.XPATH, "//div[@data-testid='confirmationSheetConfirm']").click()
-        print('[⊘] Blocked User: ' + promoter.get_attribute('innerHTML'))
         print('[✝] R.I.P')
-    except:
-        log.error('Could Not Block Promoter!')
+    except Exception as e:
+        log.error('Could Not Block Promoter: ' + e)
         return False
 
 # Scroll down to lazy load more tweets
