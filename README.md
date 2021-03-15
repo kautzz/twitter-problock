@@ -30,18 +30,21 @@ This has been fun for a while and oddly comforting whenever I hit that block but
 ### Output Sample:
 
 ```
-[☩] Loading Target: XXX
+[☩] Loading Target: https://twitter.com/login
 [☑] Logged In As User: XXX
-===============================
-[⚲] No Promoted Content Found In Timeline
-[⬇] Scrolling To Lazy Load Tweets
+
 -------------------------------
 [⚠] Promoted Tweet Found!
-[⊘] Blocking User: @XYZ
-[✝] R.I.P
-[☭] Blocked 1/1 Promoters
+[⊘] Blocking User: YYY
+[☭] Blocked 1/10 Promoters
 ===============================
-[☑] End Of Program
+[⚠] Promoted Tweet Found!
+[⊘] Blocking User: ZZZ
+[☭] Blocked 2/10 Promoters
+===============================
+.
+.
+.
 ```
 
 ### Does It Actually Work?:

@@ -93,7 +93,7 @@ def wait_for_pageload():
         return
 
     try:
-        WebDriverWait(browser, 10).until(EC.invisibility_of_element_located((By.XPATH, "//div[@role='progressbar']/following::div[contains(@style, '26px')]")))
+        WebDriverWait(browser, 5).until(EC.invisibility_of_element_located((By.XPATH, "//div[@role='progressbar']/following::div[contains(@style, '26px')]")))
     except:
         log.error('Timed Out Waiting For New Content!')
         return 0
