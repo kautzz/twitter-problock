@@ -150,14 +150,8 @@ def block_user(promoted):
 
     try:
         promoted.find_element(By.XPATH, ".//div[@data-testid='caret']").click()
-        element = WebDriverWait(browser, 5).until(EC.element_to_be_clickable(By.XPATH, "//div[@data-testid='block']"))
-        element.click()
-        #time.sleep(0.1)
-        #browser.find_element(By.XPATH, "//div[@data-testid='block']").click()
-        element = WebDriverWait(browser, 5).until(EC.element_to_be_clickable(By.XPATH, "//div[@data-testid='confirmationSheetConfirm']"))
-        element.click()
-        #time.sleep(1)
-        #browser.find_element(By.XPATH, "//div[@data-testid='confirmationSheetConfirm']").click()
+        WebDriverWait(browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//div[@data-testid='block']"))).click()
+        WebDriverWait(browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//div[@data-testid='confirmationSheetConfirm']"))).click()
         print('[✝] R.I.P')
     except Exception as e:
         log.error('Could Not Block Promoter: ' + e)
@@ -186,12 +180,13 @@ def refresh_page():
 
 def main():
 
+    block_target = config.getint('main', 'blocks')
     blocked_users = 0
     lazy_loads = 0
 
     timeline = login()
 
-    while blocked_users < config.getint('main', 'blocks'):
+    while blocked_users < block_target:
 
         promoted = search_promoted(timeline)
 
