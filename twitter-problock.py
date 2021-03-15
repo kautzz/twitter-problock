@@ -6,11 +6,13 @@ twitter-problock (MVP)
 Scrape your twitter account for promoted content and block the source. You Pay - I Block!
 """
 
+import argparse
 import secrets
 import time
 import datetime
-import random
 import simpleaudio as sa
+from configparser import ConfigParser
+import logging as log
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -19,7 +21,17 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 
-from configparser import ConfigParser
+parser = argparse.ArgumentParser(
+    description='Scrape your twitter account for promoted content and block the source. You Pay - I Block!'
+)
+parser.add_argument("-v", "--verbose", help="increase output verbosity",
+                    action="store_true")
+
+args = parser.parse_args()
+if args.verbose:
+    log.basicConfig(level=log.INFO, format='%(asctime)s - %(levelname)s: %(message)s')
+
+
 config = ConfigParser()
 config.read('config.ini')
 
@@ -34,6 +46,7 @@ browser.set_window_size(config.getint('browser_window', 'width'), config.getint(
 # Saves browser window size and position to the config when you move the window
 def update_browser_window_config():
 
+    log.info('Checking For Browser Window Changes')
     window_position = browser.get_window_position(windowHandle ='current')
     window_size = browser.get_window_size(windowHandle ='current')
     save_changes = False
@@ -54,11 +67,12 @@ def update_browser_window_config():
     if save_changes == True:
         with open('config.ini', 'w') as f:
             config.write(f)
-            print('config updated')
+            log.info('Browser Window Config Written')
 
 
 # Plays a notification sound when a user has been blocked if enabled in config
 def play_notification_sound():
+    log.info('Playing Notification Sound If Enabled')
     if config.getboolean('main', 'sound_enabled') == True:
         wave_obj = sa.WaveObject.from_wave_file("notification.wav")
         play_obj = wave_obj.play()
@@ -67,31 +81,32 @@ def play_notification_sound():
 
 # Wait until content of the page has loaded completly
 def wait_for_pageload():
-    print('waiting for pageload')
+    log.info('Waiting For Pageload')
     start_time = datetime.datetime.now()
 
     try:
         WebDriverWait(browser, 3).until(EC.visibility_of_element_located((By.XPATH, "//div[@role='progressbar']/following::div[contains(@style, '26px')]")))
     except:
-        print('nothing was loading...')
-        return 0
+        log.warning('Could Not Trigger Loading New Content!')
+        return
 
     try:
         WebDriverWait(browser, 5).until(EC.invisibility_of_element_located((By.XPATH, "//div[@role='progressbar']/following::div[contains(@style, '26px')]")))
     except:
-        print('pageload timed out...')
-        return 1
+        log.error('Timed Out Waiting For New Content!')
+        return 0
 
     end_time = datetime.datetime.now()
     time_diff = (end_time - start_time)
     execution_time = time_diff.total_seconds()
 
-    print('done! waited: ' + str(execution_time) + 's')
+    log.info('New Content Loaded. Took: ' + str(execution_time) + 'seconds')
+    return 1
 
 
 # Log in to twitter with creds provided in secrets file
 def login():
-
+    log.info('Logging In')
     browser.get(secrets.url)
     print('[☩] Loading Target: ' + secrets.url)
     time.sleep(1)
@@ -114,6 +129,7 @@ def login():
 
 # Search for any tweets in the timeline that are tagged with promoted
 def search_promoted(timeline):
+    log.info('Searching Timeline For Promoted Content')
     try:
         promoted = timeline.find_element(By.XPATH, ".//*[contains(text(), 'Promoted')]//ancestor::div[4]")
         print('-------------------------------')
@@ -126,39 +142,36 @@ def search_promoted(timeline):
 
 # Block the user that created the promoted tweet
 def block_user(promoted):
-
+    log.info('Blocking Promoter')
     promoter = promoted.find_element(By.XPATH, ".//*[contains(text(), '@')]")
-    print('[⊘] Blocking User: ' + promoter.get_attribute('innerHTML'))
+    time.sleep(3)
 
     try:
         promoted.find_element(By.XPATH, ".//div[@data-testid='caret']").click()
-        time.sleep(1)
+        time.sleep(3)
         browser.find_element(By.XPATH, "//div[@data-testid='block']").click()
-        time.sleep(1)
+        time.sleep(3)
         browser.find_element(By.XPATH, "//div[@data-testid='confirmationSheetConfirm']").click()
+        print('[⊘] Blocked User: ' + promoter.get_attribute('innerHTML'))
         print('[✝] R.I.P')
     except:
-        print('blocking failed')
-
+        log.error('Could Not Block Promoter!')
+        return False
 
 # Scroll down to lazy load more tweets
 def load_more_tweets():
-
-    #print('[⬇] Scrolling To Lazy Load Tweets')
+    log.info('Scrolling To Lazy Load Tweets')
     browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     load_result = wait_for_pageload()
 
-    if load_result == 0:
-        return
-
-    timeline = browser.find_element(By.XPATH, "//div[@data-testid='primaryColumn']")
-    return timeline
+    if load_result == 1:
+        timeline = browser.find_element(By.XPATH, "//div[@data-testid='primaryColumn']")
+        return timeline
 
 
 # Do a page reload instead of lazy loading to get more tweets
 def refresh_page():
-
-    #print('[⟳] Reloading Page')
+    log.info('Reloading Page')
     browser.refresh()
     refresh_result = wait_for_pageload()
 
@@ -168,13 +181,9 @@ def refresh_page():
 
 def main():
 
-    # How many promoters should we block today
     block_target = config.getint('main', 'blocks')
     blocked_users = 0
-
-    # How often should we lazy load before we refesh the page
-    max_lazy_loads = config.getint('main', 'max_lazy_loads')
-    lazy_loads = 0
+    i = 0
 
     timeline = login()
 
@@ -183,27 +192,28 @@ def main():
         promoted = search_promoted(timeline)
 
         if promoted is not None:
-            block_user(promoted)
-            blocked_users += 1
-
-            print('[☭] Blocked ' + str(blocked_users) + '/' + str(block_target) + ' Promoters')
-            print('===============================')
-            play_notification_sound()
+            block_result = block_user(promoted)
+            if block_result is not False:
+                blocked_users += 1
+                print('[☭] Blocked ' + str(blocked_users) + '/' + str(block_target) + ' Promoters')
+                print('===============================')
+                play_notification_sound()
 
             timeline = refresh_page()
-            lazy_loads = 0
-
-        elif lazy_loads <= max_lazy_loads:
-            #print('[⚲] No Promoted Content Found In Timeline')
-            timeline = load_more_tweets()
-            lazy_loads += 1
 
         else:
-            #print('[⚲] No Promoted Content Found In Timeline')
-            timeline = refresh_page()
-            lazy_loads = 0
+            log.info('No Promoted Content Found In Timeline')
+            load_result = load_more_tweets()
+            if load_result is not None:
+                timeline = load_result
+                i += 1
+                log.info('Number Of Lazy Loads Before Pagerefresh: ' + str(i))
+            else:
+                timeline = refresh_page()
+                i = 0
 
         update_browser_window_config()
+        log.info('****************************************')
 
 if __name__ == "__main__":
     main()
