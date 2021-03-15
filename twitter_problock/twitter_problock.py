@@ -93,7 +93,7 @@ def wait_for_pageload():
         return
 
     try:
-        WebDriverWait(browser, 5).until(EC.invisibility_of_element_located((By.XPATH, "//div[@role='progressbar']/following::div[contains(@style, '26px')]")))
+        WebDriverWait(browser, 10).until(EC.invisibility_of_element_located((By.XPATH, "//div[@role='progressbar']/following::div[contains(@style, '26px')]")))
     except:
         log.error('Timed Out Waiting For New Content!')
         return 0
@@ -125,7 +125,7 @@ def login():
     login_result = wait_for_pageload()
     timeline = browser.find_element(By.XPATH, "//div[@data-testid='primaryColumn']")
 
-    print('===============================')
+    print('')
     return timeline
 
 
@@ -152,7 +152,6 @@ def block_user(promoted):
         promoted.find_element(By.XPATH, ".//div[@data-testid='caret']").click()
         WebDriverWait(browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//div[@data-testid='block']"))).click()
         WebDriverWait(browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//div[@data-testid='confirmationSheetConfirm']"))).click()
-        print('[✝] R.I.P')
     except Exception as e:
         log.error('Could Not Block Promoter: ' + e)
         return False
