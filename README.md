@@ -51,20 +51,21 @@ This has been fun for a while and oddly comforting whenever I hit that block but
 
 It does. Twitter seems to deliver less promoted content on web-browsers than in the native app so finding promoted tweets and blocking their source with this tool takes quite a while but it steadily grew my list of blocked accounts. As the list got longer and longer I now have to scroll quite a while on my phone to find any promoted tweets :)
 
-### Coming Up / TODO
-
-* make problock more robust i.e. catch more exceptions
-* add metrics to see what accounts have been blocked and when
-* out of curiosity add some sort of analytics to the tool to see who is promoting what at what time of the day
-* any other ideas?
 
 ### Setup (WIP)
 
-* install Firefox
-* install geckodriver
+* install Firefox & geckodriver
 * set up python and dependencies (you can use anaconda and the environment file included)
 * add your twitter handle and password to the secrets file
 * let her rip
+
+```
+python -m twitter_problock
+```
+For more output:
+```
+python -m twitter_problock -v
+```
 
 ### Approaches That Did Not Work:
 

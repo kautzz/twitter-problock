@@ -87,15 +87,15 @@ def wait_for_pageload():
     start_time = datetime.datetime.now()
 
     try:
-        WebDriverWait(browser, 3).until(EC.visibility_of_element_located((By.XPATH, "//div[@role='progressbar']/following::div[contains(@style, '26px')]")))
+        WebDriverWait(browser, 2).until(EC.visibility_of_element_located((By.XPATH, "//div[@role='progressbar']/following::div[contains(@style, '26px')]")))
     except:
         log.info('Could Not Trigger Loading New Content!')
         return
 
     try:
-        WebDriverWait(browser, 5).until(EC.invisibility_of_element_located((By.XPATH, "//div[@role='progressbar']/following::div[contains(@style, '26px')]")))
+        WebDriverWait(browser, 7).until(EC.invisibility_of_element_located((By.XPATH, "//div[@role='progressbar']/following::div[contains(@style, '26px')]")))
     except:
-        log.error('Timed Out Waiting For New Content!')
+        log.info('Timed Out Waiting For New Content!')
         return 0
 
     end_time = datetime.datetime.now()
@@ -149,7 +149,7 @@ def block_user(promoted):
     print('[⊘] Blocking User: ' + promoter.get_attribute('innerHTML'))
 
     try:
-        promoted.find_element(By.XPATH, ".//div[@data-testid='caret']").click()
+        WebDriverWait(browser, 5).until(EC.element_to_be_clickable((By.XPATH, ".//div[@data-testid='caret']"))).click()
         WebDriverWait(browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//div[@data-testid='block']"))).click()
         WebDriverWait(browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//div[@data-testid='confirmationSheetConfirm']"))).click()
     except Exception as e:
@@ -212,7 +212,7 @@ def main():
 
         update_browser_window_config()
         log.info('****************************************')
-        time.sleep(1) # TODO make this a more random wait to hide that this is an automation
+        time.sleep(1) # just for good measure
 
 if __name__ == "__main__":
     main()
